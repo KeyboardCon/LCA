@@ -1,0 +1,274 @@
+{
+  "study": "BC1 packaged 1 L electric kettle at factory gate",
+  "boundary": "Materials, component manufacture, assembly, packaging; excludes delivery, use, end of life",
+  "dataset": "Archived TianGong LCA data 0.2.0; current platform data not retrieved",
+  "method": "Environmental Footprint Climate change GWP100; archived method UUID 6209b35f-9447-40b5-b68c-a1099e3674a0",
+  "method_file_sha256": "c0fe31d3c045ae85b64bd85a3bfa41e1f246d664e8f8d463005f37dee003a5a8",
+  "bom_mass_g": {
+    "Kettle": "723.00",
+    "Packaging": "137.80"
+  },
+  "total_finished_mass_g": "860.80",
+  "materials": [
+    {
+      "material": "Stainless steel",
+      "part": "Kettle",
+      "mass_g": "186.00",
+      "match_status": "provisional",
+      "match_rationale": "Electric furnace steel route; alloy composition and kettle forming are not verified",
+      "process_uuid": "6fcb8304-d211-4c79-a9de-a1b07058ce02",
+      "characterized_direct_gwp100_kg_co2e": "0",
+      "process_name": "Stainless steel ; scrap steel,pig iron(lump)，ferrochrome alloy,direct reduction iron,slagging agent ; Electric furnace method ; All sizes; NESPS2",
+      "process_version": "00.01.005",
+      "process_year": "2019",
+      "process_location": "CN",
+      "process_source_url": "https://github.com/tiangong-lca/data/blob/c50cab7961e0b0ca11c26a600bd4c90fea6c6c32/tiangong_lca_data/processes/6fcb8304-d211-4c79-a9de-a1b07058ce02.xml",
+      "process_file_sha256": "fd8679219f8dea8eeff0a4eb64322d41519f5f8c317dbe02c0a09bd7402ea94a",
+      "reference_flow_uuid": "de2a5069-b64b-412b-9abf-aecd9d946fbe",
+      "reference_amount_kg": "1000.0",
+      "process_scale": "0.000186",
+      "unresolved_upstream_input_flow_uuids": [],
+      "uncharacterized_direct_output_flow_uuids": [
+        "08a91e70-3ddc-11dd-9501-0050c2490048",
+        "08a91e70-3ddc-11dd-97ef-0050c2490048"
+      ]
+    },
+    {
+      "material": "Brass",
+      "part": "Kettle",
+      "mass_g": "20.25",
+      "match_status": "provisional",
+      "match_rationale": "Copper-zinc alloy producing Brass; scrap route and part forming are not verified",
+      "process_uuid": "216385c1-5e30-4122-b31a-afcea87645c0",
+      "characterized_direct_gwp100_kg_co2e": "0",
+      "process_name": "Copper-zinc alloy ; Copper scrap+zinc ingot ; Reflection furnace ; All sizes; NESPS2",
+      "process_version": "00.01.005",
+      "process_year": "2019",
+      "process_location": "CN",
+      "process_source_url": "https://github.com/tiangong-lca/data/blob/c50cab7961e0b0ca11c26a600bd4c90fea6c6c32/tiangong_lca_data/processes/216385c1-5e30-4122-b31a-afcea87645c0.xml",
+      "process_file_sha256": "1542f98fe92ac338f19bba8518a24984c149309d20ebb9127a7457b29487ef12",
+      "reference_flow_uuid": "e422cfbf-5444-43ab-a68a-22be82e2ad47",
+      "reference_amount_kg": "1000.0",
+      "process_scale": "0.00002025",
+      "unresolved_upstream_input_flow_uuids": [],
+      "uncharacterized_direct_output_flow_uuids": [
+        "08a91e70-3ddc-11dd-9501-0050c2490048",
+        "08a91e70-3ddc-11dd-97ef-0050c2490048",
+        "f79d0f8f-2b0e-49cb-bed0-b1ea0fbd8625"
+      ]
+    },
+    {
+      "material": "Copper",
+      "part": "Kettle",
+      "mass_g": "15.00",
+      "match_status": "provisional",
+      "match_rationale": "Primary refined copper; actual kettle copper grade and forming are not verified",
+      "process_uuid": "b70a631e-ea11-4b12-b42c-b0f507a72f6d",
+      "characterized_direct_gwp100_kg_co2e": "0.033054450",
+      "process_name": "copper production;cathode copper; primary production by bath smelting approach;sulfide ore",
+      "process_version": "00.01.005",
+      "process_year": "2014",
+      "process_location": "CN",
+      "process_source_url": "https://github.com/tiangong-lca/data/blob/c50cab7961e0b0ca11c26a600bd4c90fea6c6c32/tiangong_lca_data/processes/b70a631e-ea11-4b12-b42c-b0f507a72f6d.xml",
+      "process_file_sha256": "eeabc78cc9efdd685f0fbcf3e50ce94f8c86f558007582103650534d88cb8186",
+      "reference_flow_uuid": "176d7abf-4f6c-4584-a720-f9a518ce7d2d",
+      "reference_amount_kg": "1000.0",
+      "process_scale": "0.000015",
+      "unresolved_upstream_input_flow_uuids": [
+        "2ca6ea1d-175a-4e6e-a4bc-f95efdd927c2",
+        "4f19a2ff-7b3b-11dd-ad8b-0800200c9a66",
+        "53afe53a-7bbc-4b82-8e39-df2c6bbb2c46",
+        "73ba867a-b7a6-4d91-a8e4-b3b844fe1354",
+        "9d258d75-6792-4f1c-9856-81602ed8f816",
+        "c3d78270-b990-4043-9ca5-ae3a7b0d7cdb",
+        "c431c0c3-3f5e-4b7b-af99-2ebbdcaf5f98",
+        "f0e01792-b7a5-475e-abb7-de0ac339d606"
+      ],
+      "uncharacterized_direct_output_flow_uuids": [
+        "08a91e70-3ddc-11dd-9501-0050c2490048",
+        "08a91e70-3ddc-11dd-97ee-0050c2490048",
+        "fe0acd60-3ddc-11dd-a207-0050c2490048"
+      ]
+    },
+    {
+      "material": "Polypropylene (PP)",
+      "part": "Kettle",
+      "mass_g": "350.25",
+      "match_status": "provisional",
+      "match_rationale": "Gas-phase polypropylene; grade and injection molding are not verified",
+      "process_uuid": "91a5462f-3a1a-49e9-afec-07b60609dfaf",
+      "characterized_direct_gwp100_kg_co2e": "0",
+      "process_name": "Polypropylene ; Propylene, ethylene, hydrogen, triethyl aluminum ; gas phase method ; All sizes; NESPS2",
+      "process_version": "00.01.005",
+      "process_year": "2019",
+      "process_location": "CN",
+      "process_source_url": "https://github.com/tiangong-lca/data/blob/c50cab7961e0b0ca11c26a600bd4c90fea6c6c32/tiangong_lca_data/processes/91a5462f-3a1a-49e9-afec-07b60609dfaf.xml",
+      "process_file_sha256": "34f18802a7cff31e269871933738438c70284d577ce62ff40615cd8c18f13283",
+      "reference_flow_uuid": "54802cfb-bd58-4f85-9ebf-9e0616529c1c",
+      "reference_amount_kg": "1000.0",
+      "process_scale": "0.00035025",
+      "unresolved_upstream_input_flow_uuids": [],
+      "uncharacterized_direct_output_flow_uuids": [
+        "08a91e70-3ddc-11dd-9155-0050c2490048",
+        "08a91e70-3ddc-11dd-9501-0050c2490048",
+        "08a91e70-3ddc-11dd-97ef-0050c2490048",
+        "0dd1dfef-db07-4e19-ba7b-ee8128fc96e1",
+        "46854df3-e13d-4a5a-9e11-6319f1f8347e"
+      ]
+    },
+    {
+      "material": "Polyvinyl chloride (PVC)",
+      "part": "Kettle",
+      "mass_g": "43.50",
+      "match_status": "provisional",
+      "match_rationale": "Primary PVC production; compound grade and extrusion are not verified",
+      "process_uuid": "24fca75a-cefc-483b-8168-e349eb15c25b",
+      "characterized_direct_gwp100_kg_co2e": "0",
+      "process_name": "polyvinyl chloride production ; primary polyvinyl chloride; 150000t/a ; ethylene",
+      "process_version": "00.01.005",
+      "process_year": "2013",
+      "process_location": "YN-CN",
+      "process_source_url": "https://github.com/tiangong-lca/data/blob/c50cab7961e0b0ca11c26a600bd4c90fea6c6c32/tiangong_lca_data/processes/24fca75a-cefc-483b-8168-e349eb15c25b.xml",
+      "process_file_sha256": "02b5164daac41f49128f1dcc784da9acefc0c7b3e9200775559dd332e1819bec",
+      "reference_flow_uuid": "e9ba8900-4c21-4a2f-89c7-018cf30a01ea",
+      "reference_amount_kg": "1000.0",
+      "process_scale": "0.0000435",
+      "unresolved_upstream_input_flow_uuids": [
+        "4f197be9-7b3b-11dd-ad8b-0800200c9a66",
+        "4f19a2f4-7b3b-11dd-ad8b-0800200c9a66",
+        "4f1a1830-7b3b-11dd-ad8b-0800200c9a66",
+        "7467387c-cf99-412c-a58f-5824e126aed1",
+        "890a70b7-b677-4e2a-8a1b-7d017e0a10ae",
+        "8e1e39c0-11ef-4607-85f0-157ae68f6c63",
+        "c1532d81-6290-43ea-8a57-db9ee1704af5",
+        "c707e768-2a44-4b33-8218-e8dcdb345132",
+        "d71fef59-2e93-450f-b18f-72981f58e312"
+      ],
+      "uncharacterized_direct_output_flow_uuids": [
+        "08a91e70-3ddc-11dd-950a-0050c2490048",
+        "08a91e70-3ddc-11dd-97e0-0050c2490048",
+        "08a91e70-3ddc-11dd-97ef-0050c2490048",
+        "4d9a8790-3ddd-11dd-9b46-0050c2490048",
+        "618d3d9a-9f85-417d-b0c4-e87942a9e345",
+        "e575ebc3-0a3b-4c38-9a2a-13e42c72553b",
+        "fe0acd60-3ddc-11dd-a70a-0050c2490048",
+        "fe0acd60-3ddc-11dd-a8c9-0050c2490048",
+        "fe0acd60-3ddc-11dd-aab0-0050c2490048",
+        "fe0acd60-3ddc-11dd-ac48-0050c2490048"
+      ]
+    },
+    {
+      "material": "Nylon (grade unspecified)",
+      "part": "Kettle",
+      "mass_g": "49.50",
+      "match_status": "unmatched",
+      "match_rationale": "Nylon grade is not specified in the BOM; archive candidates are fiber processes",
+      "process_uuid": null,
+      "characterized_direct_gwp100_kg_co2e": null
+    },
+    {
+      "material": "Polyoxymethylene (POM)",
+      "part": "Kettle",
+      "mass_g": "9.75",
+      "match_status": "unmatched",
+      "match_rationale": "No defensible matching production process found in archive",
+      "process_uuid": null,
+      "characterized_direct_gwp100_kg_co2e": null
+    },
+    {
+      "material": "Polycarbonate (PC)",
+      "part": "Kettle",
+      "mass_g": "6.75",
+      "match_status": "unmatched",
+      "match_rationale": "No defensible matching production process found in archive",
+      "process_uuid": null,
+      "characterized_direct_gwp100_kg_co2e": null
+    },
+    {
+      "material": "Acrylonitrile-butadiene-styrene (ABS)",
+      "part": "Kettle",
+      "mass_g": "30.00",
+      "match_status": "unmatched",
+      "match_rationale": "No defensible matching production process found in archive",
+      "process_uuid": null,
+      "characterized_direct_gwp100_kg_co2e": null
+    },
+    {
+      "material": "Silicone",
+      "part": "Kettle",
+      "mass_g": "12.00",
+      "match_status": "unmatched",
+      "match_rationale": "No defensible matching production process found in archive",
+      "process_uuid": null,
+      "characterized_direct_gwp100_kg_co2e": null
+    },
+    {
+      "material": "LDPE packaging foil",
+      "part": "Packaging",
+      "mass_g": "6.30",
+      "match_status": "provisional",
+      "match_rationale": "LDPE resin production; film extrusion is not included",
+      "process_uuid": "218eaad4-dfc5-4a21-abd3-2e9dd0997fe3",
+      "characterized_direct_gwp100_kg_co2e": "0.0000605682",
+      "process_name": "Low Density Polyethylene(LDPE) production;LDPE",
+      "process_version": "00.01.005",
+      "process_year": "2020",
+      "process_location": "CN",
+      "process_source_url": "https://github.com/tiangong-lca/data/blob/c50cab7961e0b0ca11c26a600bd4c90fea6c6c32/tiangong_lca_data/processes/218eaad4-dfc5-4a21-abd3-2e9dd0997fe3.xml",
+      "process_file_sha256": "6125a9d100477622aa8e9627c54c99cb41c1b02a01257523860c3f86e438aa7f",
+      "reference_flow_uuid": "1ff32f1d-77ac-4a6f-b91c-67b08b13e55a",
+      "reference_amount_kg": "1.0",
+      "process_scale": "0.0063",
+      "unresolved_upstream_input_flow_uuids": [
+        "4f19ca0d-7b3b-11dd-ad8b-0800200c9a66",
+        "890a70b7-b677-4e2a-8a1b-7d017e0a10ae"
+      ],
+      "uncharacterized_direct_output_flow_uuids": [
+        "08a91e70-3ddc-11dd-975a-0050c2490048",
+        "4d9a8790-3ddd-11dd-9bb8-0050c2490048",
+        "fe0acd60-3ddc-11dd-a8c4-0050c2490048"
+      ]
+    },
+    {
+      "material": "Cardboard packaging",
+      "part": "Packaging",
+      "mass_g": "131.50",
+      "match_status": "provisional",
+      "match_rationale": "Corrugated carton proxy; BOM specifies cardboard without grade",
+      "process_uuid": "b0a8d882-9859-4069-b59b-90dd19dc98a0",
+      "characterized_direct_gwp100_kg_co2e": "0",
+      "process_name": "Corrugated carton production ; corrugated cardboard ; cutting, printing, packaging",
+      "process_version": "00.01.005",
+      "process_year": "2017",
+      "process_location": "CN",
+      "process_source_url": "https://github.com/tiangong-lca/data/blob/c50cab7961e0b0ca11c26a600bd4c90fea6c6c32/tiangong_lca_data/processes/b0a8d882-9859-4069-b59b-90dd19dc98a0.xml",
+      "process_file_sha256": "4e98d5c7da91e2acea4d5b013e17383e7961cb901cca8deb2d97e4315de24668",
+      "reference_flow_uuid": "4f197bec-7b3b-11dd-ad8b-0800200c9a66",
+      "reference_amount_kg": "1000.0",
+      "process_scale": "0.0001315",
+      "unresolved_upstream_input_flow_uuids": [
+        "3a8411b6-e476-4f98-9d77-0d492661a07f",
+        "732b5d9c-8145-4346-ab0b-4850d679fcb4",
+        "890a70b7-b677-4e2a-8a1b-7d017e0a10ae",
+        "8bde297e-98df-463f-bcb4-0db52bf6e0b5",
+        "92ae1ece-04f3-4b7b-b0a0-4fcaa6076210"
+      ],
+      "uncharacterized_direct_output_flow_uuids": [
+        "08a91e70-3ddc-11dd-97ee-0050c2490048"
+      ]
+    }
+  ],
+  "selected_materials": 7,
+  "unmatched_materials": 5,
+  "characterized_direct_emission_subtotal_kg_co2e": "0.0331150182",
+  "gwp100_total_kg_co2e": null,
+  "calculation_status": "incomplete: provisional matches, missing materials, upstream suppliers and manufacturing operations",
+  "checks": {
+    "bom_mass_balance": "passed: 723 g kettle + 137.8 g packaging = 860.8 g",
+    "reference_units": "passed for selected processes: product mass in kg",
+    "contribution_sum": "passed for characterized direct-emission subtotal only",
+    "supplier_closure": "failed: unresolved product inputs and absent manufacturing steps",
+    "double_counting": "not fully assessed: component forming and assembly inventory absent"
+  },
+  "warning": "The direct-emission subtotal is NOT the kettle footprint; missing contributions are unknown, not zero."
+}

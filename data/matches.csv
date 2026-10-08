@@ -1,0 +1,13 @@
+material,process_uuid,status,rationale
+Stainless steel,6fcb8304-d211-4c79-a9de-a1b07058ce02,provisional,Electric furnace steel route; alloy composition and kettle forming are not verified
+Brass,216385c1-5e30-4122-b31a-afcea87645c0,provisional,Copper-zinc alloy producing Brass; scrap route and part forming are not verified
+Copper,b70a631e-ea11-4b12-b42c-b0f507a72f6d,provisional,Primary refined copper; actual kettle copper grade and forming are not verified
+Polypropylene (PP),91a5462f-3a1a-49e9-afec-07b60609dfaf,provisional,Gas-phase polypropylene; grade and injection molding are not verified
+Polyvinyl chloride (PVC),24fca75a-cefc-483b-8168-e349eb15c25b,provisional,Primary PVC production; compound grade and extrusion are not verified
+Nylon (grade unspecified),,unmatched,Nylon grade is not specified in the BOM; archive candidates are fiber processes
+Polyoxymethylene (POM),,unmatched,No defensible matching production process found in archive
+Polycarbonate (PC),,unmatched,No defensible matching production process found in archive
+Acrylonitrile-butadiene-styrene (ABS),,unmatched,No defensible matching production process found in archive
+Silicone,,unmatched,No defensible matching production process found in archive
+LDPE packaging foil,218eaad4-dfc5-4a21-abd3-2e9dd0997fe3,provisional,LDPE resin production; film extrusion is not included
+Cardboard packaging,b0a8d882-9859-4069-b59b-90dd19dc98a0,provisional,Corrugated carton proxy; BOM specifies cardboard without grade
