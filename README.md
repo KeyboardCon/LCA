@@ -119,8 +119,9 @@ webpage's kettle task and TianGong as the database, then supplied the page as
 a PDF and pointed to the TianGong GitHub organization. Codex selected the
 provisional process matches, retained missing values, and implemented the
 checks. The user has not yet reviewed or accepted the matches. The
-[decision log](data/search_log.md) is the curated record; private messages and
-credentials are not included.
+[prompt and decision log](PROMPTS.md) records consequential requests and
+choices; the [search log](data/search_log.md) records process alternatives.
+Private messages and credentials are not included.
 
 ## 10. Independent and revised runs
 
