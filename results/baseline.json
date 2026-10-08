@@ -2,7 +2,11 @@
   "study": "BC1 packaged 1 L electric kettle at factory gate",
   "boundary": "Materials, component manufacture, assembly, packaging; excludes delivery, use, end of life",
   "dataset": "Archived TianGong LCA data 0.2.0; current platform data not retrieved",
+  "archive_commit": "c50cab7961e0b0ca11c26a600bd4c90fea6c6c32",
+  "retrieval_date": "2026-10-08",
   "method": "Environmental Footprint Climate change GWP100; archived method UUID 6209b35f-9447-40b5-b68c-a1099e3674a0",
+  "method_version": "01.00.000",
+  "method_source_url": "https://github.com/tiangong-lca/data/blob/c50cab7961e0b0ca11c26a600bd4c90fea6c6c32/tiangong_lca_data/lciamethods/6209b35f-9447-40b5-b68c-a1099e3674a0.xml",
   "method_file_sha256": "c0fe31d3c045ae85b64bd85a3bfa41e1f246d664e8f8d463005f37dee003a5a8",
   "bom_mass_g": {
     "Kettle": "723.00",
@@ -26,6 +30,7 @@
       "process_file_sha256": "fd8679219f8dea8eeff0a4eb64322d41519f5f8c317dbe02c0a09bd7402ea94a",
       "reference_flow_uuid": "de2a5069-b64b-412b-9abf-aecd9d946fbe",
       "reference_amount_kg": "1000.0",
+      "reference_unit": "kg",
       "process_scale": "0.000186",
       "unresolved_upstream_input_flow_uuids": [],
       "uncharacterized_direct_output_flow_uuids": [
@@ -49,6 +54,7 @@
       "process_file_sha256": "1542f98fe92ac338f19bba8518a24984c149309d20ebb9127a7457b29487ef12",
       "reference_flow_uuid": "e422cfbf-5444-43ab-a68a-22be82e2ad47",
       "reference_amount_kg": "1000.0",
+      "reference_unit": "kg",
       "process_scale": "0.00002025",
       "unresolved_upstream_input_flow_uuids": [],
       "uncharacterized_direct_output_flow_uuids": [
@@ -73,6 +79,7 @@
       "process_file_sha256": "eeabc78cc9efdd685f0fbcf3e50ce94f8c86f558007582103650534d88cb8186",
       "reference_flow_uuid": "176d7abf-4f6c-4584-a720-f9a518ce7d2d",
       "reference_amount_kg": "1000.0",
+      "reference_unit": "kg",
       "process_scale": "0.000015",
       "unresolved_upstream_input_flow_uuids": [
         "2ca6ea1d-175a-4e6e-a4bc-f95efdd927c2",
@@ -106,6 +113,7 @@
       "process_file_sha256": "34f18802a7cff31e269871933738438c70284d577ce62ff40615cd8c18f13283",
       "reference_flow_uuid": "54802cfb-bd58-4f85-9ebf-9e0616529c1c",
       "reference_amount_kg": "1000.0",
+      "reference_unit": "kg",
       "process_scale": "0.00035025",
       "unresolved_upstream_input_flow_uuids": [],
       "uncharacterized_direct_output_flow_uuids": [
@@ -132,6 +140,7 @@
       "process_file_sha256": "02b5164daac41f49128f1dcc784da9acefc0c7b3e9200775559dd332e1819bec",
       "reference_flow_uuid": "e9ba8900-4c21-4a2f-89c7-018cf30a01ea",
       "reference_amount_kg": "1000.0",
+      "reference_unit": "kg",
       "process_scale": "0.0000435",
       "unresolved_upstream_input_flow_uuids": [
         "4f197be9-7b3b-11dd-ad8b-0800200c9a66",
@@ -218,6 +227,7 @@
       "process_file_sha256": "6125a9d100477622aa8e9627c54c99cb41c1b02a01257523860c3f86e438aa7f",
       "reference_flow_uuid": "1ff32f1d-77ac-4a6f-b91c-67b08b13e55a",
       "reference_amount_kg": "1.0",
+      "reference_unit": "kg",
       "process_scale": "0.0063",
       "unresolved_upstream_input_flow_uuids": [
         "4f19ca0d-7b3b-11dd-ad8b-0800200c9a66",
@@ -245,6 +255,7 @@
       "process_file_sha256": "4e98d5c7da91e2acea4d5b013e17383e7961cb901cca8deb2d97e4315de24668",
       "reference_flow_uuid": "4f197bec-7b3b-11dd-ad8b-0800200c9a66",
       "reference_amount_kg": "1000.0",
+      "reference_unit": "kg",
       "process_scale": "0.0001315",
       "unresolved_upstream_input_flow_uuids": [
         "3a8411b6-e476-4f98-9d77-0d492661a07f",

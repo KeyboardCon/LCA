@@ -4,19 +4,24 @@ import argparse
 import csv
 import hashlib
 import json
+import subprocess
 from collections import defaultdict
 from decimal import Decimal
 from pathlib import Path
 import xml.etree.ElementTree as ET
 
 HERE = Path(__file__).resolve().parent
+DEFAULT_DATASET = HERE.parent / "tiangong-data" / "tiangong_lca_data"
 PROCESS = "{http://lca.jrc.it/ILCD/Process}"
 FLOW = "{http://lca.jrc.it/ILCD/Flow}"
+FLOW_PROPERTY = "{http://lca.jrc.it/ILCD/FlowProperty}"
+UNIT_GROUP = "{http://lca.jrc.it/ILCD/UnitGroup}"
 METHOD = "{http://lca.jrc.it/ILCD/LCIAMethod}"
 COMMON = "{http://lca.jrc.it/ILCD/Common}"
 XML_LANG = "{http://www.w3.org/XML/1998/namespace}lang"
 MASS_PROPERTY = "93a60a56-a3c8-11da-a746-0800200b9a66"
 GWP_METHOD = "6209b35f-9447-40b5-b68c-a1099e3674a0"
+ARCHIVE_COMMIT = "c50cab7961e0b0ca11c26a600bd4c90fea6c6c32"
 
 
 def read_csv(path):
@@ -50,6 +55,28 @@ def flow_type_and_property(dataset, flow_id):
     return kind, property_id
 
 
+def validate_mass_unit(dataset):
+    property_root = ET.parse(dataset / "flowproperties" / f"{MASS_PROPERTY}.xml").getroot()
+    unit_ref = property_root.find(f".//{FLOW_PROPERTY}referenceToReferenceUnitGroup")
+    if unit_ref is None:
+        raise ValueError("Mass property has no unit group")
+    group_id = unit_ref.get("refObjectId")
+    group = ET.parse(dataset / "unitgroups" / f"{group_id}.xml").getroot()
+    reference_id = group.findtext(f".//{UNIT_GROUP}referenceToReferenceUnit")
+    for unit in group.findall(f".//{UNIT_GROUP}unit"):
+        if unit.get("dataSetInternalID") == reference_id:
+            if unit.findtext(f"{UNIT_GROUP}name") == "kg" and Decimal(unit.findtext(f"{UNIT_GROUP}meanValue")) == 1:
+                return
+    raise ValueError("Mass property reference unit is not kg")
+
+
+def validate_dataset_commit(dataset):
+    result = subprocess.run(["git", "-C", str(dataset.parent), "rev-parse", "HEAD"],
+                            capture_output=True, text=True, check=True)
+    if result.stdout.strip() != ARCHIVE_COMMIT:
+        raise ValueError("Archive checkout is not the pinned TianGong data commit")
+
+
 def factors(dataset):
     path = dataset / "lciamethods" / f"{GWP_METHOD}.xml"
     root = ET.parse(path).getroot()
@@ -63,10 +90,13 @@ def factors(dataset):
             if key in result and result[key] != Decimal(value):
                 raise ValueError(f"Conflicting GWP factor for {key}")
             result[key] = Decimal(value)
-    return result, sha256(path)
+    version = root.findtext(f".//{COMMON}dataSetVersion")
+    return result, sha256(path), version
 
 
 def assess(dataset):
+    validate_dataset_commit(dataset)
+    validate_mass_unit(dataset)
     bom = read_csv(HERE / "data" / "bom.csv")
     matches = {row["material"]: row for row in read_csv(HERE / "data" / "matches.csv")}
     if len(matches) != len(bom) or {row["material"] for row in bom} != set(matches):
@@ -80,7 +110,7 @@ def assess(dataset):
     if totals != {"Kettle": Decimal("723"), "Packaging": Decimal("137.8")}:
         raise ValueError(f"BOM does not match the classroom mass check: {dict(totals)}")
 
-    cf, method_hash = factors(dataset)
+    cf, method_hash, method_version = factors(dataset)
     results = []
     subtotal = Decimal(0)
     cache = {}
@@ -143,6 +173,7 @@ def assess(dataset):
                       "process_source_url": "https://github.com/tiangong-lca/data/blob/c50cab7961e0b0ca11c26a600bd4c90fea6c6c32/tiangong_lca_data/processes/" + mapping["process_uuid"] + ".xml",
                       "process_file_sha256": sha256(path),
                       "reference_flow_uuid": reference[0], "reference_amount_kg": str(reference[2]),
+                      "reference_unit": "kg",
                       "process_scale": str(scale),
                       "characterized_direct_gwp100_kg_co2e": str(direct),
                       "unresolved_upstream_input_flow_uuids": sorted(set(upstream)),
@@ -152,7 +183,11 @@ def assess(dataset):
     return {"study": "BC1 packaged 1 L electric kettle at factory gate",
             "boundary": "Materials, component manufacture, assembly, packaging; excludes delivery, use, end of life",
             "dataset": "Archived TianGong LCA data 0.2.0; current platform data not retrieved",
+            "archive_commit": ARCHIVE_COMMIT,
+            "retrieval_date": "2026-10-08",
             "method": "Environmental Footprint Climate change GWP100; archived method UUID " + GWP_METHOD,
+            "method_version": method_version,
+            "method_source_url": "https://github.com/tiangong-lca/data/blob/c50cab7961e0b0ca11c26a600bd4c90fea6c6c32/tiangong_lca_data/lciamethods/" + GWP_METHOD + ".xml",
             "method_file_sha256": method_hash,
             "bom_mass_g": {key: str(value) for key, value in totals.items()},
             "total_finished_mass_g": str(sum(totals.values())),
@@ -170,15 +205,51 @@ def assess(dataset):
             "warning": "The direct-emission subtotal is NOT the kettle footprint; missing contributions are unknown, not zero."}
 
 
+def write_mapping_csv(result, path):
+    fields = ["material", "mass_g", "database", "release", "dataset_name",
+              "dataset_uuid", "dataset_version", "geography", "year",
+              "reference_flow_uuid", "reference_amount_kg", "reference_unit",
+              "source_url", "retrieval_date", "file_sha256", "match_status",
+              "match_rationale", "unresolved_upstream_input_count",
+              "uncharacterized_direct_output_count"]
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", newline="", encoding="utf-8") as stream:
+        writer = csv.DictWriter(stream, fieldnames=fields)
+        writer.writeheader()
+        for item in result["materials"]:
+            writer.writerow({
+                "material": item["material"], "mass_g": item["mass_g"],
+                "database": "TianGong LCA historical archive",
+                "release": "0.2.0; commit " + result["archive_commit"],
+                "dataset_name": item.get("process_name", "unknown"),
+                "dataset_uuid": item.get("process_uuid") or "unknown",
+                "dataset_version": item.get("process_version", "unknown"),
+                "geography": item.get("process_location", "unknown"),
+                "year": item.get("process_year", "unknown"),
+                "reference_flow_uuid": item.get("reference_flow_uuid", "unknown"),
+                "reference_amount_kg": item.get("reference_amount_kg", "unknown"),
+                "reference_unit": item.get("reference_unit", "unknown"),
+                "source_url": item.get("process_source_url", "unknown"),
+                "retrieval_date": result["retrieval_date"],
+                "file_sha256": item.get("process_file_sha256", "unknown"),
+                "match_status": item["match_status"],
+                "match_rationale": item["match_rationale"],
+                "unresolved_upstream_input_count": len(item.get("unresolved_upstream_input_flow_uuids", [])),
+                "uncharacterized_direct_output_count": len(item.get("uncharacterized_direct_output_flow_uuids", [])),
+            })
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--dataset", type=Path, default=Path("/workspace/tiangong-data/tiangong_lca_data"))
+    parser.add_argument("--dataset", type=Path, default=DEFAULT_DATASET)
     parser.add_argument("--output", type=Path, default=HERE / "results" / "baseline.json")
+    parser.add_argument("--mapping-output", type=Path, default=HERE / "results" / "mapping.csv")
     args = parser.parse_args()
     result = assess(args.dataset)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(result, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-    print(f"Saved {args.output}; status: {result['calculation_status']}")
+    write_mapping_csv(result, args.mapping_output)
+    print(f"Saved {args.output} and {args.mapping_output}; status: {result['calculation_status']}")
 
 
 if __name__ == "__main__":
