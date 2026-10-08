@@ -14,6 +14,13 @@ class AssessmentChecks(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "not the pinned"):
                 assess.validate_dataset_commit(assess.DEFAULT_DATASET)
 
+    def test_modified_archive_is_rejected(self):
+        calls = [SimpleNamespace(stdout=assess.ARCHIVE_COMMIT + "\n"),
+                 SimpleNamespace(stdout=" M tiangong_lca_data/processes/example.xml\n")]
+        with patch.object(assess.subprocess, "run", side_effect=calls):
+            with self.assertRaisesRegex(ValueError, "modified or untracked"):
+                assess.validate_dataset_commit(assess.DEFAULT_DATASET)
+
     def test_archived_method_has_fossil_co2_factor_one(self):
         dataset = assess.DEFAULT_DATASET
         factors, _, _ = assess.factors(dataset)
@@ -37,6 +44,15 @@ class AssessmentChecks(unittest.TestCase):
         self.assertIsNone(result["gwp100_total_kg_co2e"])
         self.assertEqual(result["total_finished_mass_g"], "860.80")
         self.assertGreater(result["unmatched_materials"], 0)
+        copper = next(x for x in result["materials"] if x["material"] == "Copper")
+        self.assertEqual(copper["process_allocation_approach"], "Allocation - market value")
+        self.assertTrue(any(x["flow_name"] == "Slag" for x in copper["nonreference_product_outputs"]))
+        self.assertEqual(copper["characterized_direct_gwp100_kg_co2e"], "0.033054450")
+        ldpe = next(x for x in result["materials"] if x["material"] == "LDPE packaging foil")
+        self.assertEqual(ldpe["characterized_direct_gwp100_kg_co2e"], "0.0000605682")
+        self.assertEqual(result["characterized_direct_emission_subtotal_kg_co2e"], "0.0331150182")
+        polypropylene = next(x for x in result["materials"] if x["material"] == "Polypropylene (PP)")
+        self.assertTrue(polypropylene["missing_flow_definitions"])
 
     def test_mapping_table_preserves_unknown_inputs(self):
         result = assess.assess(assess.DEFAULT_DATASET)

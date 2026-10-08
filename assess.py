@@ -6,9 +6,11 @@ import hashlib
 import json
 import subprocess
 from collections import defaultdict
+from datetime import datetime
 from decimal import Decimal
 from pathlib import Path
 import xml.etree.ElementTree as ET
+from zoneinfo import ZoneInfo
 
 HERE = Path(__file__).resolve().parent
 DEFAULT_DATASET = HERE.parent / "tiangong-data" / "tiangong_lca_data"
@@ -38,6 +40,10 @@ def english_name(root, path):
         if item.get(XML_LANG) == "en":
             return item.text or ""
     return ""
+
+
+def flow_description(reference):
+    return english_name(reference, f"{COMMON}shortDescription") or reference.findtext(f"{COMMON}shortDescription") or "unknown"
 
 
 def flow_type_and_property(dataset, flow_id):
@@ -75,6 +81,11 @@ def validate_dataset_commit(dataset):
                             capture_output=True, text=True, check=True)
     if result.stdout.strip() != ARCHIVE_COMMIT:
         raise ValueError("Archive checkout is not the pinned TianGong data commit")
+    status = subprocess.run(["git", "-C", str(dataset.parent), "status", "--porcelain",
+                             "--untracked-files=normal", "--", "tiangong_lca_data"],
+                            capture_output=True, text=True, check=True)
+    if status.stdout.strip():
+        raise ValueError("Archived TianGong data files are modified or untracked")
 
 
 def factors(dataset):
@@ -128,6 +139,11 @@ def assess(dataset):
         root = ET.parse(path).getroot()
         ref_id = root.findtext(f".//{PROCESS}referenceToReferenceFlow")
         name = english_name(root, f".//{PROCESS}dataSetInformation/{PROCESS}name/{PROCESS}baseName")
+        use_advice = english_name(root, f".//{PROCESS}useAdviceForDataSet")
+        dataset_type = root.findtext(f".//{PROCESS}typeOfDataSet")
+        allocation_approach = root.findtext(f".//{PROCESS}LCIMethodApproach")
+        broken_sources = [ref.get("refObjectId") for ref in root.findall(f".//{PROCESS}referenceToDataSource")
+                          if "#REF!" in (ref.get("refObjectId") or "") or "#REF!" in (ref.get("uri") or "")]
         version = root.findtext(f".//{COMMON}dataSetVersion")
         year = root.findtext(f".//{COMMON}referenceYear")
         location = root.find(f".//{PROCESS}locationOfOperationSupplyOrProduction")
@@ -140,7 +156,8 @@ def assess(dataset):
             amount_text = exchange.findtext(f"{PROCESS}meanAmount")
             if amount_text is None:
                 raise ValueError(f"Exchange without amount in {path}")
-            record = (flow_ref.get("refObjectId"), exchange.findtext(f"{PROCESS}exchangeDirection"), Decimal(amount_text))
+            record = (flow_ref.get("refObjectId"), exchange.findtext(f"{PROCESS}exchangeDirection"),
+                      Decimal(amount_text), flow_description(flow_ref))
             exchanges.append(record)
             if exchange.get("dataSetInternalID") == ref_id:
                 reference = record
@@ -153,22 +170,37 @@ def assess(dataset):
         scale = Decimal(row["mass_g"]) / Decimal(1000) / reference[2]
         direct = Decimal(0)
         uncharacterized = []
-        upstream = []
-        for flow_id, direction, amount in exchanges:
+        upstream = {}
+        missing_flow_definitions = []
+        nonreference_outputs = []
+        for flow_id, direction, amount, flow_name in exchanges:
             if amount == 0 or flow_id == reference[0]:
                 continue
             if flow_id not in cache:
                 cache[flow_id] = flow_type_and_property(dataset, flow_id)
             kind, property_id = cache[flow_id]
-            if kind == "Elementary flow" and direction == "Output":
+            if kind is None:
+                missing_flow_definitions.append({"flow_uuid": flow_id, "flow_name": flow_name,
+                                                 "direction": direction, "source_mean_amount": str(amount),
+                                                 "source_unit": "unknown: flow XML absent"})
+            elif kind == "Elementary flow" and direction == "Output":
                 if flow_id in cf and property_id == MASS_PROPERTY:
                     direct += amount * scale * cf[flow_id]
                 else:
                     uncharacterized.append(flow_id)
             elif kind == "Product flow" and direction == "Input":
-                upstream.append(flow_id)
+                upstream[flow_id] = {"flow_uuid": flow_id, "flow_name": flow_name,
+                                     "provider_process_uuid": None}
+            elif kind == "Product flow" and direction == "Output":
+                nonreference_outputs.append({"flow_uuid": flow_id, "flow_name": flow_name,
+                                             "source_mean_amount": str(amount),
+                                             "source_unit": "kg" if property_id == MASS_PROPERTY else "not verified"})
         entry.update({"process_name": name, "process_version": version,
                       "process_year": year,
+                      "process_dataset_type": dataset_type,
+                      "process_use_advice": use_advice,
+                      "process_allocation_approach": allocation_approach,
+                      "broken_source_reference_ids": broken_sources,
                       "process_location": location.get("location") if location is not None else None,
                       "process_source_url": "https://github.com/tiangong-lca/data/blob/c50cab7961e0b0ca11c26a600bd4c90fea6c6c32/tiangong_lca_data/processes/" + mapping["process_uuid"] + ".xml",
                       "process_file_sha256": sha256(path),
@@ -176,7 +208,10 @@ def assess(dataset):
                       "reference_unit": "kg",
                       "process_scale": str(scale),
                       "characterized_direct_gwp100_kg_co2e": str(direct),
-                      "unresolved_upstream_input_flow_uuids": sorted(set(upstream)),
+                      "unresolved_upstream_input_flow_uuids": sorted(upstream),
+                      "unresolved_upstream_inputs": [upstream[key] for key in sorted(upstream)],
+                      "missing_flow_definitions": missing_flow_definitions,
+                      "nonreference_product_outputs": nonreference_outputs,
                       "uncharacterized_direct_output_flow_uuids": sorted(set(uncharacterized))})
         subtotal += direct
         results.append(entry)
@@ -184,7 +219,7 @@ def assess(dataset):
             "boundary": "Materials, component manufacture, assembly, packaging; excludes delivery, use, end of life",
             "dataset": "Archived TianGong LCA data 0.2.0; current platform data not retrieved",
             "archive_commit": ARCHIVE_COMMIT,
-            "retrieval_date": "2026-10-08",
+            "retrieval_date": datetime.now(ZoneInfo("Asia/Seoul")).date().isoformat(),
             "method": "Environmental Footprint Climate change GWP100; archived method UUID " + GWP_METHOD,
             "method_version": method_version,
             "method_source_url": "https://github.com/tiangong-lca/data/blob/c50cab7961e0b0ca11c26a600bd4c90fea6c6c32/tiangong_lca_data/lciamethods/" + GWP_METHOD + ".xml",
@@ -196,13 +231,15 @@ def assess(dataset):
             "unmatched_materials": sum(not x["process_uuid"] for x in results),
             "characterized_direct_emission_subtotal_kg_co2e": str(subtotal),
             "gwp100_total_kg_co2e": None,
-            "calculation_status": "incomplete: provisional matches, missing materials, upstream suppliers and manufacturing operations",
+            "calculation_status": "incomplete diagnostic: provisional matches, missing materials, upstream suppliers, allocation and manufacturing operations",
             "checks": {"bom_mass_balance": "passed: 723 g kettle + 137.8 g packaging = 860.8 g",
-                       "reference_units": "passed for selected processes: product mass in kg",
+                       "reference_units": "passed for selected reference product flows: mass in kg; not a full exchange-unit audit",
                        "contribution_sum": "passed for characterized direct-emission subtotal only",
                        "supplier_closure": "failed: unresolved product inputs and absent manufacturing steps",
-                       "double_counting": "not fully assessed: component forming and assembly inventory absent"},
-            "warning": "The direct-emission subtotal is NOT the kettle footprint; missing contributions are unknown, not zero."}
+                       "flow_definitions": "incomplete: some process exchanges reference absent flow XML files",
+                       "allocation": "not assessed: copper source declares market-value allocation and also outputs slag; allocation factor not verified",
+                       "double_counting": "not fully assessed: carton process includes cutting/printing; future conversion steps need overlap review"},
+            "warning": "The unallocated characterized direct-emission diagnostic is NOT the kettle footprint or a lower bound; missing contributions are unknown, not zero."}
 
 
 def write_mapping_csv(result, path):
@@ -211,10 +248,12 @@ def write_mapping_csv(result, path):
               "reference_flow_uuid", "reference_amount_kg", "reference_unit",
               "source_url", "retrieval_date", "file_sha256", "match_status",
               "match_rationale", "unresolved_upstream_input_count",
-              "uncharacterized_direct_output_count"]
+              "uncharacterized_direct_output_flow_uuid_count", "missing_flow_definition_exchange_count",
+              "nonreference_product_output_exchange_count", "source_dataset_type",
+              "source_allocation_approach", "broken_source_reference_count", "source_use_advice"]
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", newline="", encoding="utf-8") as stream:
-        writer = csv.DictWriter(stream, fieldnames=fields)
+        writer = csv.DictWriter(stream, fieldnames=fields, lineterminator="\n")
         writer.writeheader()
         for item in result["materials"]:
             writer.writerow({
@@ -235,7 +274,13 @@ def write_mapping_csv(result, path):
                 "match_status": item["match_status"],
                 "match_rationale": item["match_rationale"],
                 "unresolved_upstream_input_count": len(item.get("unresolved_upstream_input_flow_uuids", [])),
-                "uncharacterized_direct_output_count": len(item.get("uncharacterized_direct_output_flow_uuids", [])),
+                "uncharacterized_direct_output_flow_uuid_count": len(item.get("uncharacterized_direct_output_flow_uuids", [])),
+                "missing_flow_definition_exchange_count": len(item.get("missing_flow_definitions", [])),
+                "nonreference_product_output_exchange_count": len(item.get("nonreference_product_outputs", [])),
+                "source_dataset_type": item.get("process_dataset_type", "unknown"),
+                "source_allocation_approach": item.get("process_allocation_approach", "unknown"),
+                "broken_source_reference_count": len(item.get("broken_source_reference_ids", [])),
+                "source_use_advice": item.get("process_use_advice", "unknown"),
             })
 
 

@@ -1,5 +1,10 @@
 # BC1 electric kettle: TianGong archive screening
 
+**Status:** This repository contains a traceable **partial diagnostic** using
+historical TianGong data. It does not yet meet the classroom requirement for
+a full kettle GWP100 total and an independent/revised comparison. The missing
+data and checks are identified below.
+
 ## 1. Study identity and purpose
 
 Run ID: `baseline-archive-20261008` (incomplete baseline screening; no revised
@@ -12,7 +17,8 @@ GWP100 per packaged kettle. This is an **incomplete screening run**, not a
 comparable final result. The first screening files are preserved in commit
 `8f9428b903b6f6518169fa0913041f4138223ea3`; it is **not** a final
 independent-run submission SHA. There is no complete-result Git tag or revised
-run. A prediction made before this calculation was not recorded.
+run. The GitHub repository displayed `Public` when checked on 2026-10-08. A
+prediction made before this calculation was not recorded.
 
 ## 2. Product, unit and boundary
 
@@ -27,9 +33,26 @@ end of life are excluded. No intentional mass or impact cut-off was chosen;
 unmodeled stages are data gaps. The archival background processes are CN;
 the actual kettle production location and reference year are unknown. Heating
 power, voltage and other commercial specifications are also unknown because
-BC1 is a representative base case, not a named product. Only selected raw
-material processes' direct emissions are calculated in this screening;
-component forming, assembly and packaging conversion remain unmodeled.
+BC1 is a representative base case, not a named product. Only selected
+background processes' direct emissions are characterized in this screening.
+The selected carton process includes cutting, printing and packaging, but its
+upstream cardboard and electricity remain unresolved. Other component
+forming, assembly and LDPE film extrusion are unmodeled.
+
+```mermaid
+flowchart LR
+  M[12 finished material masses] --> F[Component forming: missing]
+  F --> A[Assembly: missing]
+  A --> K[Kettle: 723 g]
+  L[LDPE resin record] --> E[Foil extrusion: missing]
+  E --> P[Packaging: 137.8 g]
+  C[Carton record: cutting and printing included] --> P
+  K --> G[Factory gate: one packaged kettle, 860.8 g]
+  P --> G
+```
+
+The arrows show the intended physical system. The calculation below uses
+only direct exchanges from provisional background records, not all arrows.
 
 ## 3. Foreground inventory and assumptions
 
@@ -42,7 +65,8 @@ BOM. The table separates those source values from assumptions and gaps:
 | LDPE foil, cardboard | 6.30, 131.50 | g/kettle | Same BOM; 137.80 total | Sourced finished masses |
 | Selected process scaling yield | 100 | % of finished mass | No measured losses supplied | Assumed for **direct-exchange screening only** |
 | Real process yields, purchase masses and grade | Unknown | kg, % | Not specified in BOM | Missing; no purchase inventory claimed |
-| Molding, metal forming, film conversion services | Unknown | per kettle | Not specified | Missing |
+| Molding, metal forming, LDPE film extrusion | Unknown | per kettle | Not specified | Missing |
+| Carton cutting, printing and packaging | Included in selected background process | per 1000 kg cartons | TianGong carton dataset `b0a8d882-9859-4069-b59b-90dd19dc98a0` | Provisional; upstream inputs unresolved |
 | Assembly electricity | Unknown | kWh/kettle | PDF states it is not specified | Missing |
 | Supply-chain and factory transport | Unknown | kg·km/kettle | Not specified | Missing |
 | Scrap, recycling route and credits | Unknown | kg/kettle | Not specified | Missing; no credits applied |
@@ -50,9 +74,10 @@ BOM. The table separates those source values from assumptions and gaps:
 
 The script uses `mass_g / 1000 / reference_amount_kg` to scale each unit
 process. The assumed 100% scaling does not establish real purchase quantities.
-No separate forming or energy process is added, so there is no explicit
-double count in the script; the boundary of each background process still
-needs review before combining it with future conversion services. Missing
+No separate foreground forming or energy process is added. The carton
+dataset already includes some conversion and an electricity input, so a
+future carton conversion step could double count them. Other process
+boundaries also need review before adding conversion services. Missing
 burdens are **unknown**, not zero.
 
 ## 4. Data and matching
@@ -61,14 +86,20 @@ Background source: archived `tiangong-lca/data` release `0.2.0`, Git commit
 `c50cab7961e0b0ca11c26a600bd4c90fea6c6c32`. Its README states that
 maintenance and GitHub release downloads ended on 2026-06-21; current data
 are available from the TianGong platform. The source [match decisions](data/matches.csv),
-generated [complete mapping table](results/mapping.csv) and
+generated [12-item BOM mapping table](results/mapping.csv) and
 [search log](data/search_log.md) give inputs, queries, alternatives and
 decisions. The [result manifest](results/baseline.json)
 contains dataset names, UUIDs, versions, years, locations, reference flow
 UUIDs/amounts in kg, source URLs, hashes and unresolved flow links. Files were
 retrieved 2026-10-08. Seven material matches are provisional and five are
-unmatched. These are unit-process inventories, **not cumulative cradle-to-gate
-factors**. Several records explicitly lack upstream energy or feedstock data.
+unmatched. The selected records are unit-process inventories (five single
+operation, two black-box), **not cumulative cradle-to-gate factors**. Several
+records explicitly lack upstream energy or feedstock data; an input-flow count
+of zero in steel, brass or PP is **not** evidence of supplier closure. The JSON
+lists known product input flow names/UUIDs with provider IDs set to `null`,
+missing flow definitions, and non-reference product outputs. No actual
+provider links were established. The selected copper XML has a broken
+`#REF!` source link, so its underlying citation needs independent review.
 USLCI was not searched in this run because the user selected TianGong; this
 does not satisfy the page's instruction to compare both databases. Unmatched
 inputs have no dataset ID, reference flow or file hash to report.
@@ -90,13 +121,19 @@ The method XML describes an IPCC 2021 baseline and also references an older
 source; the exact published EF edition is unknown. This script uses Python's
 `Decimal` arithmetic; it has no matrix solver. Unit-process
 upstream suppliers are **not solved** (`As=f` has not been assembled), so the
-output is only characterized direct emissions. Product-flow inputs are listed
-as unresolved. Allocation and system model follow each source process as
-recorded; cross-process consistency is unverified. Recycling credits are not
-applied. Biogenic carbon treatment follows only any matching archive factors;
-missing flows are not assigned zero. The result JSON lists unmatched
-elementary-flow UUIDs for each selected process. No uncertainty distribution
-is fitted.
+output is only a diagnostic of characterized direct emissions. Product-flow
+inputs are listed as unresolved. No new allocation or cross-process system
+model is applied. The copper source declares market-value allocation but also
+outputs 2998 kg slag per 1000 kg reference copper; its allocation factor and
+whether the listed emissions are already allocated are unverified. Recycling
+credits are not applied. No selected characterized direct exchange is a
+biogenic greenhouse gas; no separate biogenic carbon balance is modeled.
+Exact UUID matching selects available archive factors. Other elementary
+outputs without a GWP100 factor are listed in the JSON; some are non-climate
+pollutants and their absence from this impact category does not itself prove
+missing GWP. Exchange references with absent flow XML are reported separately
+and cannot be classified. No unknown contribution is assigned zero. No
+uncertainty distribution is fitted.
 
 ## 6. Reproduce
 
@@ -105,7 +142,9 @@ only Python's standard library. Clone both repositories side by side. The archiv
 is large (about 855 MB here). No account, API key, cache or random seed is
 needed for this archived calculation.
 The script checks that the data checkout is at the pinned commit and records
-hashes of every selected process file and the characterization method.
+that the data tree has no local changes, then records hashes of every selected
+process file and the characterization method. The manifest's retrieval date
+is the date each run accesses the local checkout, in Asia/Seoul time.
 
 ```bash
 git clone https://github.com/KeyboardCon/LCA.git
@@ -142,17 +181,19 @@ platform permissions; the generated CSV contains metadata and IDs only.
 because five materials, manufacturing operations and upstream suppliers are
 unresolved. The characterized direct-emission **subtotal of selected unit
 processes** is `0.0331150182 kg CO2-eq` per packaged kettle, of which
-`0.033054450` is from the selected copper process and `0.0000605682` from
-the selected LDPE process. The other selected process records have no matched
-GWP-emission exchanges in this calculation; their full burdens are unknown.
-This subtotal cannot be interpreted as the kettle footprint or a lower bound.
+`0.033054450` is normalized from the selected copper record and `0.0000605682`
+from the selected LDPE record. The copper number is **not confirmed as
+attributable solely to copper** because its slag output and allocation are
+unresolved. The other selected process records have no factor-matched direct
+GWP exchange in this calculation; their full burdens are unknown. This subtotal
+cannot be interpreted as the kettle footprint or a lower bound.
 There are no defensible top-three contributors to the complete product.
 
-| Material | Characterized direct GWP100 (kg CO2-eq/kettle) | Full material burden |
+| Material | Selected-record direct diagnostic (kg CO2-eq/kettle) | Full material burden |
 | --- | ---: | --- |
-| Copper | 0.033054450 | Unknown: 8 unresolved product inputs |
+| Copper | 0.033054450 before verified slag allocation | Unknown: 8 unresolved product inputs |
 | LDPE foil | 0.0000605682 | Unknown: 2 unresolved product inputs; film conversion absent |
-| Steel, brass, PP, PVC, cardboard | 0 in the matched direct exchanges | Unknown: process and supplier gaps |
+| Steel, brass, PP, PVC, cardboard | No factor-matched direct GWP exchange | Unknown: process and supplier gaps; some flow XML absent |
 | Nylon, POM, PC, ABS, silicone | Not calculated | No accepted process match |
 
 These rows sum to the **direct subtotal only**; they are not a complete
@@ -160,11 +201,14 @@ contribution breakdown. No figure was generated because there is no complete
 total to plot. This is an archived TianGong baseline; no USLCI or alternative
 method scenario was calculated.
 
-Checks: BOM mass and reference units pass. The direct subtotal equals the sum
-of recorded direct contributions. Supplier closure fails, and the full
-double-counting check cannot pass without conversion-service data. The result
-is most affected by missing upstream material production and forming, not by
-numerical precision. CN historical processes are imperfect proxies for an
+Checks: BOM mass and selected product-reference kg units pass; this is not a
+full exchange-unit audit. The direct diagnostic equals the sum of its recorded
+factor-matched exchanges. Supplier closure fails, some flow definitions are
+absent, and allocation remains unverified. The full double-counting check
+cannot pass without conversion-service data; carton cutting and printing need
+an explicit overlap check before adding any separate carton service. Major
+known gaps include upstream supply, five unmatched materials, and forming;
+their relative sizes are unknown. CN historical processes are imperfect proxies for an
 unspecified kettle production region and year.
 
 ## 8. Uncertainty and sensitivity
@@ -187,7 +231,9 @@ provisional process matches, retained missing values, and implemented the
 checks. The user provided the PDF and requested a final README audit; the
 assistant transcribed the BOM, revised the README and reran the checks. No
 independent human validation of the model or final numerical result has been
-recorded. The user has not yet reviewed or accepted the matches. The
+recorded. A separate Codex technical audit reproduced the two nonzero direct
+terms and identified the allocation and missing-flow caveats. The user has
+not yet reviewed or accepted the matches. The
 [prompt and decision log](PROMPTS.md) records consequential requests and
 choices; the [search log](data/search_log.md) records process alternatives.
 Private messages and credentials are not included.

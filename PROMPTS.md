@@ -16,6 +16,7 @@ contact details or private account data are included.
 | 7 | Organize the consequential prompts. | Added this curated log and linked it from the README. | Decisions and limitations can be reviewed without publishing the chat transcript. |
 | 8 | Check README against every field in the classroom PDF and update GitHub. | Audited all ten sections; added a parameter/status table, source and method details, portable reproduction commands, explicit missing checks and preserved screening commit. Updated the calculation manifest with method version and reference units, then reran tests. | The README describes the incomplete status more precisely; no full footprint was invented. |
 | 9 | Recheck the README against the supplied `readme-requirements.md` and update GitHub. | Confirmed the ten required sections, generated an input-level mapping CSV, identified unknown specifications and alias, documented access permissions and uncertainty limits, and retested reproduction. | README and artifacts were updated without presenting a missing total as zero. |
+| 10 | Re-read the entire six-page PDF, check for omissions and provide the final commit SHA. | A separate PDF audit and technical audit checked the README against all pages and recalculated the two nonzero direct terms. They found that carton conversion was partly included, copper has a slag output and unverified allocation, and some flow XML files are missing. The code now reports these gaps, verifies a clean pinned data checkout, and the README limits its claims. | This is still a diagnostic screening, not a full kettle GWP100 result. The final SHA is supplied separately after the GitHub commit. |
 
 ## Match decisions and unresolved work
 
@@ -30,7 +31,9 @@ contact details or private account data are included.
   measured manufacturing loss, assembly electricity, transport, scrap or
   recycled-content assumption was supplied; these are unresolved, not zero.
 - The archived process output `0.0331150182 kg CO2-eq` is a characterized
-  direct-emission subtotal. It is **not** the kettle's full climate impact.
+  direct-emission diagnostic. Copper attribution is unverified because the
+  source also outputs slag and declares market-value allocation. It is **not**
+  the kettle's full climate impact.
 - Current TianGong Production access still needs the saved network-policy
   change to be published and a human browser OAuth login. Any current-data
   replacement should record its own dataset IDs, versions, retrieval dates,
